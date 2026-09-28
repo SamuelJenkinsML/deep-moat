@@ -1,4 +1,4 @@
-<p align="center"><img src="icons/logo.svg" width="112" alt="Moatie, the Deep Moat mascot"></p>
+<p align="center"><img src="icons/moatie.svg" width="420" alt="Moatie, the Deep Moat mascot"></p>
 
 # Deep Moat
 
@@ -30,5 +30,5 @@ A private, fast site blocker for Chromium. No tracking, no network requests, no 
 
 ```sh
 npm test               # node --test, no dependencies
-./icons/build.sh       # re-render PNG icons from logo.svg (needs rsvg-convert)
+./icons/build.sh       # re-render icons and ASCII art (needs rsvg-convert, magick)
 ```

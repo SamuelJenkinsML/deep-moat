@@ -29,12 +29,9 @@ output { font-size: .85rem; }
 input[type=number] { width: 5em; }
 
 .blocked { min-height: 100vh; display: grid; place-content: center; justify-items: center; text-align: center; gap: 10px; padding: 16px; }
-.moatie { width: 112px; height: 112px; }
-.moatie .tower { fill: var(--accent); }
-.moatie .face { fill: var(--bg); stroke: var(--bg); }
-.moatie .wave { stroke: var(--moat); }
-.moatie .shut, .rest .moatie .open { display: none; }
-.rest .moatie .shut { display: inline; }
+.moatie { width: min(480px, 90vw); }
+.moatie.shut, .rest .moatie:not(.shut) { display: none; }
+.rest .moatie.shut { display: block; }
 #challenge { user-select: none; max-width: 38ch; word-break: break-all; letter-spacing: .08em; font-size: 1rem; }
 #typed { width: min(38ch, 90vw); }
 .blocked details { max-width: 90vw; display: grid; justify-items: center; }
