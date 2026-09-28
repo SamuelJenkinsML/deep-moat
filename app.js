@@ -1,5 +1,5 @@
 import { MIN, REASON, normalize, parseSchedule, phase, used, why } from './core.js';
-import { load, save, togglePomo } from './store.js';
+import { load, resetPomo, save, togglePomo } from './store.js';
 
 const $ = q => document.querySelector(q);
 const fmt = ms => `${Math.floor(ms / MIN)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
@@ -43,9 +43,9 @@ function renderTargets() {
 
 function renderStatus() {
   const now = Date.now(), p = s.pomo.startedAt && phase(s.pomo, now);
-  Object.assign($('#pomo'), { textContent: p ? 'Stop' : 'Start focus', disabled: !!p?.work, title: p?.work ? 'Focus can only be stopped during rest' : '' });
-  $('#intent').hidden = !!p;
-  $('#pomoState').textContent = p ? `${p.work ? 'Focus' : 'Rest'} ${fmt(p.left)}${s.pomo.intent ? ` · ${s.pomo.intent}` : ''}` : '';
+  $('#pomo').textContent = !p ? 'Start focus' : s.pomo.pausedAt ? 'Resume' : 'Pause';
+  $('#intent').hidden = !($('#reset').hidden = !p);
+  $('#pomoState').textContent = p ? `${s.pomo.pausedAt ? 'Paused · ' : ''}${p.work ? 'Focus' : 'Rest'} ${fmt(p.left)}${s.pomo.intent ? ` · ${s.pomo.intent}` : ''}` : '';
   document.querySelectorAll('[data-key^="pomo."]').forEach(el => el.disabled = !!p);
   const rules = s.groups.reduce((n, g) => n + g.patterns.length, 0);
   $('#summary').value = rules > 900 ? `${rules}/1000 rules` : '';
@@ -68,6 +68,7 @@ for (const el of document.querySelectorAll('[data-key]')) {
 
 const toggle = () => togglePomo($('#intent').value).then(() => $('#intent').value = '');
 $('#pomo').onclick = toggle;
+$('#reset').onclick = resetPomo;
 $('#intent').addEventListener('keydown', e => e.key === 'Enter' && toggle());
 $('#groups').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(commit, 300); });
 $('#groups').addEventListener('change', e => e.target.name === 'patterns' && (e.target.value = patternsOf(e.target.value).join('\n')));

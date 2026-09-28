@@ -11,5 +11,5 @@
   "permissions": ["storage", "declarativeNetRequest", "alarms", "notifications", "idle"],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }],
-  "commands": { "toggle-pomodoro": { "suggested_key": { "default": "Alt+Shift+P" }, "description": "Start or stop a focus session" } }
+  "commands": { "toggle-pomodoro": { "suggested_key": { "default": "Alt+Shift+P" }, "description": "Start, pause or resume a focus session" } }
 }

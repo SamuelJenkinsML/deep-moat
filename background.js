@@ -32,7 +32,7 @@ async function apply() {
 
   const p = s.pomo.startedAt && phase(s.pomo, now), lastPhase = p ? (p.work ? 'work' : 'rest') : null;
   chrome.action.setBadgeText({ text: p ? `${Math.ceil(p.left / MIN)}m` : '' });
-  if (p) chrome.action.setBadgeBackgroundColor({ color: p.work ? '#f7768e' : '#9ece6a' });
+  if (p) chrome.action.setBadgeBackgroundColor({ color: s.pomo.pausedAt ? '#737aa2' : p.work ? '#f7768e' : '#9ece6a' });
   if (s.lastPhase && lastPhase && lastPhase !== s.lastPhase)
     notify(p.work ? 'Back to focus' : 'Rest', p.work ? s.pomo.intent || 'The moat is up.' : `${s.pomo.rest} minutes. Stretch.`);
 
@@ -40,7 +40,7 @@ async function apply() {
     !same(usage, s.usage) && chrome.storage.local.set({ usage }),
     chrome.storage.session.set({ live, rulesKey, lastPhase }),
   ]);
-  chrome.alarms.create('tick', { when: Math.min(nextChange(next, now), p ? now + (p.left % MIN || MIN) : Infinity) });
+  chrome.alarms.create('tick', { when: Math.min(nextChange(next, now), p && !s.pomo.pausedAt ? now + (p.left % MIN || MIN) : Infinity) });
 }
 
 let queue = Promise.resolve(), pending = false;
@@ -52,5 +52,4 @@ chrome.idle.setDetectionInterval(60);
 chrome.tabs.onUpdated.addListener((_, info) => info.url && run());
 chrome.storage.onChanged.addListener((c, area) => area === 'local' && Object.keys(c).some(k => k !== 'usage') && run());
 chrome.runtime.onMessage.addListener((msg, _, reply) => msg === 'apply' && (run().then(() => reply()), true));
-chrome.commands.onCommand.addListener(async c => c === 'toggle-pomodoro'
-  && !await togglePomo() && notify('Still focusing', 'Focus can only be stopped during rest.'));
+chrome.commands.onCommand.addListener(c => c === 'toggle-pomodoro' && togglePomo());

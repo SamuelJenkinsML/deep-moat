@@ -5,7 +5,7 @@ export const REASON = { schedule: 'Scheduled block', pomodoro: 'Focus session', 
 
 export const DEFAULTS = {
   groups: [{ id: 'main', name: 'Distractions', mode: 'block', patterns: [], schedule: 'mon-fri 09:00-17:00', pomodoro: true, budget: 0 }],
-  pomo: { work: 25, rest: 5, startedAt: null, intent: '' },
+  pomo: { work: 25, rest: 5, startedAt: null, pausedAt: null, intent: '' },
   glass: { grantMin: 5, baseWaitSec: 30, len: 60 },
   overrides: [],
   usage: { date: '', byGroup: {} },
@@ -44,8 +44,8 @@ const intervals = (text, now) => parseSchedule(text).flatMap(w => [-1, 0, 1, 2, 
   .filter(k => w.days.includes(new Date(at(now, k, 0)).getDay()))
   .map(k => [at(now, k, w.start), at(now, k, w.end + (w.end > w.start ? 0 : DAY))]));
 
-export const phase = ({ work, rest, startedAt }, now) => {
-  const t = (now - startedAt) % ((work + rest) * MIN);
+export const phase = ({ work, rest, startedAt, pausedAt }, now) => {
+  const t = ((pausedAt || now) - startedAt) % ((work + rest) * MIN);
   return t < work * MIN ? { work: true, left: work * MIN - t } : { work: false, left: (work + rest) * MIN - t };
 };
 
@@ -86,7 +86,7 @@ export const buildRules = (s, now, target) => {
 export const nextChange = (s, now) => Math.min(...[
   at(now, 1, 0),
   ...s.groups.flatMap(g => intervals(g.schedule, now).flat()),
-  s.pomo.startedAt && now + phase(s.pomo, now).left,
+  s.pomo.startedAt && !s.pomo.pausedAt && now + phase(s.pomo, now).left,
   ...s.overrides.map(o => o.until),
   ...s.groups.filter(g => g.budget && s.live?.groupId === g.id).map(g => now + g.budget * MIN - used(s, g, now)),
 ].filter(t => t > now));
