@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Deep Moat</title>
+<link rel="stylesheet" href="style.css">
+<link rel="modulepreload" href="core.js">
+<link rel="icon" href="icons/32.png">
+<main class="app">
+  <header class="row"><img src="icons/logo.svg" width="28" height="28" alt=""><h1 class="grow">Deep Moat</h1><output id="summary" class="on"></output></header>
+  <section class="card">
+    <div class="row">
+      <input id="intent" class="grow" placeholder="What's your focus?" aria-label="Focus intent" autofocus>
+      <button id="pomo">Start focus</button>
+    </div>
+    <output id="pomoState"></output>
+    <div class="row dim"><label>Work <input type="number" min="1" data-key="pomo.work"> min</label><label>Rest <input type="number" min="1" data-key="pomo.rest"> min</label></div>
+  </section>
+  <section id="here" class="card" hidden>
+    <div class="row"><button id="blockHere">Block <b id="hereHost"></b></button><span class="dim">in</span><select id="hereGroup" class="grow" aria-label="Group"></select></div>
+  </section>
+  <div id="groups" class="stack"></div>
+  <button id="add">+ Add group</button>
+  <details class="card">
+    <summary>Break glass</summary>
+    <div class="row dim"><label>Grant <input type="number" min="1" data-key="glass.grantMin"> min</label><label>Wait <input type="number" min="5" data-key="glass.baseWaitSec"> s</label><label>Length <input type="number" min="10" data-key="glass.len"></label></div>
+  </details>
+</main>
+<template id="tpl">
+  <fieldset>
+    <div class="row"><input name="name" class="grow" aria-label="Group name"><select name="mode" aria-label="Mode"><option value="block">Block these</option><option value="allow">Allow only these</option></select></div>
+    <textarea name="patterns" rows="3" placeholder="reddit.com&#10;youtube.com/shorts&#10;doomscroll" aria-label="Sites"></textarea>
+    <textarea name="schedule" rows="2" placeholder="mon-fri 09:00-17:00&#10;sun 22:00-02:00" aria-label="Schedule"></textarea>
+    <div class="row dim"><label><input type="checkbox" name="pomodoro"> During focus</label><label>Budget <input type="number" min="0" name="budget"> min/day</label><span class="grow"></span><button type="button" name="del">Remove</button></div>
+    <output name="info"></output>
+  </fieldset>
+</template>
+<script type="module" src="app.js"></script>

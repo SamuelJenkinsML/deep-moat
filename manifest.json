@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Deep Moat",
+  "version": "1.0.0",
+  "description": "A private site blocker with schedules, focus sessions, daily budgets and break-glass friction.",
+  "minimum_chrome_version": "120",
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "action": { "default_popup": "app.html", "default_icon": { "16": "icons/16.png", "32": "icons/32.png" } },
+  "options_ui": { "page": "app.html", "open_in_tab": true },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "permissions": ["storage", "declarativeNetRequest", "alarms", "notifications", "idle"],
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }],
+  "commands": { "toggle-pomodoro": { "suggested_key": { "default": "Alt+Shift+P" }, "description": "Start or stop a focus session" } }
+}
