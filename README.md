@@ -7,7 +7,7 @@ A private, fast site blocker for Chromium. No tracking, no network requests, no 
 - **Groups.** Each group has its own sites, schedule, focus toggle and daily budget.
 - **Patterns.** Use `reddit.com` to block a domain and its subdomains, `youtube.com/shorts` to block a path, or a bare word like `doomscroll` to block any URL containing that keyword.
 - **Allowlist mode.** While the group is active, everything except its sites is blocked.
-- **Schedules.** One window per line, e.g. `mon-fri 09:00-17:00`, `sat,sun 10:00-12:00`, `daily 00:00-24:00`. Overnight windows such as `sun 22:00-02:00` work too.
+- **Schedules.** Pick days and hours per window. An end before the start runs overnight, and the same start and end blocks all day.
 - **Focus sessions.** A pomodoro cycle (25/5 by default) with a stated intention, a badge countdown and a notification at each phase change. Pause, resume or reset at any time; a paused session keeps its current phase, and rest never lifts a scheduled block.
 - **Daily budgets.** Minutes per day on a group's sites, counted only while the window is focused and you're active. When the budget runs out, the group blocks for the rest of the day.
 - **Break glass.** To get through a block, type a random string by hand (pasting is rejected), then wait out a timer that only runs while the tab is visible. The wait doubles with each use that day. The override applies only to the site you broke through, for a few minutes.

@@ -37,3 +37,11 @@ input[type=number] { width: 5em; }
 .blocked details { max-width: 90vw; display: grid; justify-items: center; }
 summary { cursor: pointer; color: var(--dim); }
 .stack { display: grid; gap: 12px; }
+.wins { display: grid; gap: 6px; }
+.win .row { gap: 4px; flex-wrap: nowrap; }
+.win ::-webkit-calendar-picker-indicator { display: none; }
+.days { display: flex; gap: 2px; }
+.days label { position: relative; width: 1.8em; padding: 4px 0; text-align: center; border-radius: 4px; background: var(--panel); cursor: pointer; }
+.days label:has(:checked) { background: var(--accent); color: var(--bg); }
+.days label:has(:focus-visible) { outline: 2px solid var(--accent); }
+.days input { position: absolute; opacity: 0; }

@@ -30,9 +30,15 @@
   <fieldset>
     <div class="row"><input name="name" class="grow" aria-label="Group name"><select name="mode" aria-label="Mode"><option value="block">Block these</option><option value="allow">Allow only these</option></select></div>
     <textarea name="patterns" rows="3" placeholder="reddit.com&#10;youtube.com/shorts&#10;doomscroll" aria-label="Sites"></textarea>
-    <textarea name="schedule" rows="2" placeholder="mon-fri 09:00-17:00&#10;sun 22:00-02:00" aria-label="Schedule"></textarea>
-    <div class="row dim"><label><input type="checkbox" name="pomodoro"> During focus</label><label>Budget <input type="number" min="0" name="budget"> min/day</label><span class="grow"></span><button type="button" name="del">Remove</button></div>
+    <div class="wins"></div>
+    <div class="row dim"><button type="button" name="addWin">+ Hours</button><label><input type="checkbox" name="pomodoro"> During focus</label><label>Budget <input type="number" min="0" name="budget"> min/day</label><span class="grow"></span><button type="button" name="del">Remove</button></div>
     <output name="info"></output>
   </fieldset>
+</template>
+<template id="win">
+  <div class="row win">
+    <span class="days"><label title="Monday"><input type="checkbox" value="1">M</label><label title="Tuesday"><input type="checkbox" value="2">T</label><label title="Wednesday"><input type="checkbox" value="3">W</label><label title="Thursday"><input type="checkbox" value="4">T</label><label title="Friday"><input type="checkbox" value="5">F</label><label title="Saturday"><input type="checkbox" value="6">S</label><label title="Sunday"><input type="checkbox" value="0">S</label></span>
+    <span class="row"><input type="time" aria-label="From" required><span class="dim" title="Same start and end blocks all day">–</span><input type="time" aria-label="Until" required><button type="button" name="delWin" aria-label="Remove hours">×</button></span>
+  </div>
 </template>
 <script type="module" src="app.js"></script>

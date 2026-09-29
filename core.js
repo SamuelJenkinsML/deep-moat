@@ -1,10 +1,9 @@
 export const MIN = 60_000;
 const DAY = 1440;
-const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 export const REASON = { schedule: 'Scheduled block', pomodoro: 'Focus session', budget: 'Daily budget spent' };
 
 export const DEFAULTS = {
-  groups: [{ id: 'main', name: 'Distractions', mode: 'block', patterns: [], schedule: 'mon-fri 09:00-17:00', pomodoro: true, budget: 0 }],
+  groups: [{ id: 'main', name: 'Distractions', mode: 'block', patterns: [], schedule: [{ days: [1, 2, 3, 4, 5], start: 540, end: 1020 }], pomodoro: true, budget: 0 }],
   pomo: { work: 25, rest: 5, startedAt: null, pausedAt: null, intent: '' },
   glass: { grantMin: 5, baseWaitSec: 30, len: 60 },
   overrides: [],
@@ -26,21 +25,7 @@ export const toRegex = p => !p.includes('.') ? `^https?://.*${esc(p)}.*`
   : `^https?://([^/]+\\.)?${esc(p)}${p.includes('/') ? '.*' : '([:/?#].*)?$'}`;
 export const hit = (p, url) => new RegExp(toRegex(p), 'i').test(url);
 
-const parseDays = s => s === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : s.split(',').flatMap(part => {
-  const [a, b = a] = part.split('-').map(d => DAYS.indexOf(d));
-  if (a < 0 || b < 0) throw new Error(`Unknown day in "${part}"`);
-  return Array.from({ length: (b - a + 7) % 7 + 1 }, (_, i) => (a + i) % 7);
-});
-
-export const parseSchedule = text => text.split('\n').map(l => l.trim().toLowerCase()).filter(Boolean).map(line => {
-  const m = line.match(/^([a-z,-]+)\s+(\d\d?):(\d\d)\s*-\s*(\d\d?):(\d\d)$/);
-  if (!m) throw new Error(`Expected "mon-fri 09:00-17:00", got "${line}"`);
-  const [start, end] = [m[2] * 60 + +m[3], m[4] * 60 + +m[5]];
-  if (start > DAY || end > DAY) throw new Error(`Time out of range in "${line}"`);
-  return { days: parseDays(m[1]), start, end };
-});
-
-const intervals = (text, now) => parseSchedule(text).flatMap(w => [-1, 0, 1, 2, 3, 4, 5, 6, 7]
+const intervals = (schedule, now) => schedule.flatMap(w => [-1, 0, 1, 2, 3, 4, 5, 6, 7]
   .filter(k => w.days.includes(new Date(at(now, k, 0)).getDay()))
   .map(k => [at(now, k, w.start), at(now, k, w.end + (w.end > w.start ? 0 : DAY))]));
 

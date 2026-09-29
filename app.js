@@ -1,10 +1,11 @@
-import { MIN, REASON, normalize, parseSchedule, phase, used, why } from './core.js';
+import { MIN, REASON, normalize, phase, used, why } from './core.js';
 import { load, resetPomo, save, togglePomo } from './store.js';
 
 const $ = q => document.querySelector(q);
 const fmt = ms => `${Math.floor(ms / MIN)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 const patternsOf = text => [...new Set(text.split('\n').map(normalize).filter(Boolean))];
 const fieldsets = () => [...$('#groups').children];
+const times = w => w.querySelectorAll('[type=time]');
 let s = await load(), timer;
 
 function fieldsetFor(g) {
@@ -13,24 +14,34 @@ function fieldsetFor(g) {
   e.name.value = g.name;
   e.mode.value = g.mode;
   e.patterns.value = g.patterns.join('\n');
-  e.schedule.value = g.schedule;
+  f.querySelector('.wins').append(...g.schedule.map(windowFor));
   e.pomodoro.checked = g.pomodoro;
   e.budget.value = g.budget;
   return f;
 }
 
+function windowFor({ days, start, end }) {
+  const w = $('#win').content.firstElementChild.cloneNode(true), [a, b] = times(w);
+  w.querySelectorAll('[type=checkbox]').forEach(c => c.checked = days.includes(+c.value));
+  a.valueAsNumber = start * MIN;
+  b.valueAsNumber = end * MIN;
+  return w;
+}
+
+const readWindow = w => ({ days: [...w.querySelectorAll(':checked')].map(c => +c.value), start: times(w)[0].valueAsNumber / MIN, end: times(w)[1].valueAsNumber / MIN });
+
 function readGroup(f) {
   const e = f.elements;
-  try { parseSchedule(e.schedule.value); e.schedule.setCustomValidity(''); } catch (err) { e.schedule.setCustomValidity(err.message); }
-  return e.schedule.validity.valid && {
+  return {
     id: f.dataset.id, name: e.name.value.trim() || 'Untitled', mode: e.mode.value, patterns: patternsOf(e.patterns.value),
-    schedule: e.schedule.value.trim(), pomodoro: e.pomodoro.checked, budget: Math.max(0, +e.budget.value || 0),
+    schedule: [...f.querySelectorAll('.win')].map(readWindow).filter(w => w.days.length && w.start >= 0 && w.end >= 0),
+    pomodoro: e.pomodoro.checked, budget: Math.max(0, +e.budget.value || 0),
   };
 }
 
 function commit() {
   clearTimeout(timer);
-  save({ groups: fieldsets().map(f => readGroup(f) || s.groups.find(g => g.id === f.dataset.id)).filter(Boolean) });
+  save({ groups: fieldsets().map(readGroup) });
   renderStatus();
 }
 
@@ -52,9 +63,9 @@ function renderStatus() {
   for (const f of fieldsets()) {
     const g = s.groups.find(g => g.id === f.dataset.id), e = f.elements, r = g && why(g, s, now);
     if (!g) continue;
-    e.info.className = r || e.schedule.validationMessage ? 'on' : 'dim';
-    e.info.value = e.schedule.validationMessage || [
-      r ? `Blocking · ${REASON[r]}` : g.schedule || g.pomodoro || g.budget ? 'Open' : 'Never active — add a schedule, focus or budget',
+    e.info.className = r ? 'on' : 'dim';
+    e.info.value = [
+      r ? `Blocking · ${REASON[r]}` : g.schedule.length || g.pomodoro || g.budget ? 'Open' : 'Never active — add a schedule, focus or budget',
       g.budget && `${Math.floor(used(s, g, now) / MIN)}/${g.budget} min today`,
     ].filter(Boolean).join(' · ');
   }
@@ -73,13 +84,15 @@ $('#intent').addEventListener('keydown', e => e.key === 'Enter' && toggle());
 $('#groups').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(commit, 300); });
 $('#groups').addEventListener('change', e => e.target.name === 'patterns' && (e.target.value = patternsOf(e.target.value).join('\n')));
 $('#groups').addEventListener('click', ({ target: b }) => {
+  if (b.name === 'addWin') return b.closest('fieldset').querySelector('.wins').append(windowFor({ days: [1, 2, 3, 4, 5], start: 540, end: 1020 })), commit();
+  if (b.name === 'delWin') return b.closest('.win').remove(), commit();
   if (b.name !== 'del') return;
   if (b.dataset.armed) return b.closest('fieldset').remove(), commit();
   b.dataset.armed = 1;
   b.textContent = 'Confirm remove';
 });
 $('#add').onclick = () => {
-  const f = fieldsetFor({ id: crypto.randomUUID().slice(0, 8), name: 'New group', mode: 'block', patterns: [], schedule: '', pomodoro: false, budget: 0 });
+  const f = fieldsetFor({ id: crypto.randomUUID().slice(0, 8), name: 'New group', mode: 'block', patterns: [], schedule: [], pomodoro: false, budget: 0 });
   $('#groups').append(f);
   commit();
   f.elements.name.select();
